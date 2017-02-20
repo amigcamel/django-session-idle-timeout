@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import time
+from distutils.version import StrictVersion
 
+import django
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.conf import settings
@@ -9,8 +11,13 @@ from django.utils.translation import ugettext as _
 
 SESSION_IDLE_TIMEOUT = getattr(settings, 'SESSION_IDLE_TIMEOUT', 1800)
 
+if StrictVersion(django.get_version()) >= StrictVersion('1.10'):
+    from django.utils.deprecation import MiddlewareMixin
+else:
+    MiddlewareMixin = object
 
-class SessionIdleTimeout:
+
+class SessionIdleTimeout(MiddlewareMixin):
     """Middleware class to timeout a session after a specified time period.
     """
     def process_request(self, request):
